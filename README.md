@@ -1,2 +1,2 @@
-# TemplateR
+# TemplateR - BETA
 TemplateR

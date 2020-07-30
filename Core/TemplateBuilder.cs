@@ -83,15 +83,15 @@ namespace TemplateR.Core
 
     class Placeholder
     {
-        private string _placeholder;
-        private string _formatString;
-        private string _orgPlaceholder;
-        private Configuration _configuration;
+        private string placeholder;
+        private string formatString;
+        private string orgPlaceholder;
+        private Configuration configuration;
 
         public Placeholder(Configuration configuration, string orgPlaceholder, string placeholderPath)
         {
-            _configuration = configuration;
-            _orgPlaceholder = orgPlaceholder;
+            this.configuration = configuration;
+            this.orgPlaceholder = orgPlaceholder;
             LoadPlaceholder(placeholderPath.Trim());
         }
 
@@ -100,12 +100,12 @@ namespace TemplateR.Core
             var splittedPlaceholder = placeholderPath.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
             if (splittedPlaceholder.Length == 1)
             {
-                _placeholder = splittedPlaceholder[0];
+                placeholder = splittedPlaceholder[0];
             }
             else if (splittedPlaceholder.Length == 2)
             {
-                _placeholder = splittedPlaceholder[0];
-                _formatString = splittedPlaceholder[1];
+                placeholder = splittedPlaceholder[0];
+                formatString = splittedPlaceholder[1];
             }
             else
             {
@@ -115,18 +115,18 @@ namespace TemplateR.Core
 
         public string GetOrgPlaceholder()
         {
-            return _orgPlaceholder;
+            return orgPlaceholder;
         }
 
         public string LoadValueString(object templateValueWrapper)
         {
-            var objectPaths = _placeholder.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            var objectPaths = placeholder.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries).ToList();
             return LoadValueString(templateValueWrapper, objectPaths, 0);
         }
 
         private string LoadValueString(object valueWrapper, IEnumerable<string> objectValuePath, int objectDepth)
         {
-            if (objectDepth > _configuration.MaxObjectDepth)
+            if (objectDepth > configuration.MaxObjectDepth)
             {
                 throw new IndexOutOfRangeException("Max object path depth reached.");
             }
@@ -140,7 +140,7 @@ namespace TemplateR.Core
                     var obj = property.GetValue(valueWrapper);
                     if (isEnumeration)
                     {
-                        var dataPicker = _configuration.GetDataPicker(property.PropertyType);
+                        var dataPicker = configuration.GetDataPicker(property.PropertyType);
                         return LoadValueString(dataPicker.GetObjectInCollection(obj, idx), objectValuePath.Skip(1), ++objectDepth);
                     }
                     else
@@ -159,12 +159,12 @@ namespace TemplateR.Core
                     var obj = property.GetValue(valueWrapper);
                     if (isEnumeration)
                     {
-                        var dataPicker = _configuration.GetDataPicker(property.PropertyType);
+                        var dataPicker = configuration.GetDataPicker(property.PropertyType);
                         obj = dataPicker.GetObjectInCollection(obj, idx);
                     }
-                    var converter = _configuration.GetDataConverter(property.PropertyType);
+                    var converter = configuration.GetDataConverter(property.PropertyType);
 
-                    return converter.Convert(obj, _formatString, _configuration.FormatProvider);
+                    return converter.Convert(obj, formatString, configuration.FormatProvider);
                 }
             }
             return null;
